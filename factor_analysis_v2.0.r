@@ -3,7 +3,6 @@
 # ---------------------------------------------
 # Author: Auto-generated (Updated for Boah Kim)
 # Description:
-#   Full analysis pipeline with inline English comments:
 #   - Load, clean, and merge datasets
 #   - Create derived variables
 #   - Perform KMO test and factor analysis
