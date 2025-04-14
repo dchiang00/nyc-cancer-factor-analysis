@@ -20,7 +20,7 @@ str(df_pop)
 str(df_edu)
 str(df_income)
 
-# Count NA values in each dataframe, per variable
+# count NA values in each dataframe, per variable
 na_counts_per_col <- list(
   df_county = colSums(is.na(df_county)),
   df_cancer = colSums(is.na(df_cancer)),
@@ -29,9 +29,9 @@ na_counts_per_col <- list(
   df_income = colSums(is.na(df_income))
 )
 
-print(na_counts_per_col)
 # We identify there were several N/A values, but it is in variables that
 # we will use. Therefore we choose to delete and ignore them
+print(na_counts_per_col)
 
 # clean cancer dataset:
 #   extract first 5 numbers which represents county 
@@ -135,29 +135,3 @@ ggplot(df_cancer, aes(x = reorder(County, -median_income), y = median_income, fi
   labs(title = "Median Income by County",
        x = "County", y = "Median Income",
        fill = "Income Level")
-
-# factor analysis
-df_no_county <- df_cancer[,-1:-2]
-df_no_county <- as.data.frame(scale(df_no_county))
-
-# keep relevant columns for factor analysis
-# removed "total_households" and "median_income" for now as they mess up KMO cor
-df_no_county <- df_no_county %>%
-  select(
-    starts_with("observed_"),
-    starts_with("expected_"),
-    starts_with("POPEST_"),
-    starts_with("MEDIAN_AGE"),
-    starts_with("TOTAL!!Estimate")
-  )
-
-df_no_county <- df_no_county %>% 
-  select(-observed_Total, -expected_Total)
-
-# suitability for factor analysis
-cortest.bartlett(cor(df_no_county),n = nrow(df_no_county))
-KMO(r = cor(df_no_county))
-
-# determine the number of factors
-scree(cor(df_no_county),factors = T, pc=T)
-data.frame(factor = 1:ncol(df_no_county), eigen = eigen(cor(df_no_county))$values)
