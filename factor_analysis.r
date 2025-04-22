@@ -166,136 +166,136 @@ df_merged <- df_cancer %>%
   left_join(df_edu, by = "County") %>%
   left_join(df_income, by = "County")
 
- colnames(df_merged)
-  
-  # Extract columns for factor analysis
-  df_factor<-df_merged %>%
-    select(County,median_age,gender_ratio,education_level,median_income)
-  
-  head(df_factor)
-  
-  # Extract the incidence rate by county
-  df_incidence_rate <- df_merged %>%
-    mutate(incidence_rate = (observed_total / total_population) * 100) %>%
-    select(County, incidence_rate)
-  
-  # Forrelation matrix (excluding County column)
-  cor_matrix <- round(cor(df_factor %>% select(-County), use = "complete.obs"), 3)
-  print(cor_matrix)
-  ################## median_age gender_ratio education_level median_income ################
-  # median_age           1.000        0.220          -0.373        -0.132                  #
-  # gender_ratio         0.220        1.000          -0.477        -0.265                  #
-  # education_level     -0.373       -0.477           1.000         0.429                  #
-  # median_income       -0.132       -0.265           0.429         1.000                  #
-  ##########################################################################################
-  library(corrplot)
-  
-  # plot for correlation
-  corrplot(
-    cor_matrix,
-    type = "lower",
-    col = colorRampPalette(c("red", "white", "green"))(200),
-    method = "square",
-    diag = FALSE
-  )
-  
-  # Bartlett's test of sphericity
-  factor_vars <- df_factor %>%
-    select(-County)
-    n_obs <- nrow(factor_vars)
-  
-  scaled_factor_vars <- scale(factor_vars)
-   
-  # Bartlett's test
-  bartlett_result <- cortest.bartlett(cor(scaled_factor_vars, use = "complete.obs"), n = n_obs)
-  print(bartlett_result)
-  
-  
-  # KMO
-  KMO(r = cor(scaled_factor_vars))
-  
-  # scree plot
-  scree(cor(scaled_factor_vars),factors = T, pc=T)
-  
-  # eigen value
-  data.frame(factor = 1:ncol(scaled_factor_vars), eigen = eigen(cor(factor_vars))$values)
-  
- # factor     eigen
- #  1      1 1.9785714
- #  2      2 0.8710690
- #  3      3 0.7136046
- #  4      4 0.4367549
-  
-  # Parallel Analysis 
-  fa.parallel(scaled_factor_vars, fa = "fa", fm = "pa")
-  
-  # Variance explained
-  result = fa(r = scaled_factor_vars,nfactors = 1,fm = 'pa',rotate = 'none')
-  result$Vaccounted
-  
-  # PA1
-  #SS loadings    1.4942798
-  #Proportion Var 0.3735699
-  
-  # Communalities
-  data.frame(communality = result$communality)
-  
-  # Communality
-  # median_age        0.2586987
-  # gender_ratio      0.2911646
-  # education_level   0.7717270
-  # median_income     0.3088721
-  
-  fa_varimax = fa(r = scaled_factor_vars,nfactors = 1,fm = 'pa',rotate = 'varimax')
-  print(fa_varimax$loadings,cut=0.15)
+colnames(df_merged)
 
-  # Factor loadings diagram
-  fa.diagram(fa_varimax$loadings, sort = T)
-  
-  # Factor 1 appears to reflect a latent dimension of social resources and opportunity.
-  # It is positively associated with higher levels of education (loading: +0.878) and median income (+0.492),
-  # while negatively associated with gender ratio (−0.539) and median age (−0.419).
-  # This suggests that counties with more educated, higher-income, relatively younger populations — and possibly a higher proportion of women — score higher on this factor. These characteristics are often linked to greater access to health-related resources, awareness, and preventive care.
-  # Therefore, Factor 1 can be interpreted as a Social Opportunity and Health Access Factor, capturing the socioeconomic and demographic conditions that may influence cancer outcomes such as incidence or survivorship.
-  
-  
-  # Save factor scores (explicitly name the column as "Factor1" to avoid errors)
-  factor_scores <- data.frame(
-    County = df_factor$County,
-    Factor1 = fa_varimax$scores[, 1]   # Extract the first factor score and label it "Factor1"
-  )
-  
-  # Merge factor scores with cancer incidence rate data
-  df_model <- left_join(factor_scores, df_incidence_rate, by = "County") %>%
-    na.omit()
-  
-  # Run linear regression: incidence rate ~ factor score
-  lm_model <- lm(incidence_rate ~ Factor1, data = df_model)
-  
-   # Check linear relationship using original independent variables
-  summary(lm_model)
-  
-  # Fit regression model using education and income separately
-  df_model_direct <- df_merged %>%
-    select(County, education_level, median_income, observed_total, total_population) %>%
-    mutate(incidence_rate = (observed_total / total_population) * 100) %>%
-    na.omit()
-  
-  lm_direct <- lm(incidence_rate ~ education_level + median_income, data = df_model_direct)
-  summary(lm_direct)
+# Extract columns for factor analysis
+df_factor<-df_merged %>%
+  select(County,median_age,gender_ratio,education_level,median_income)
+
+head(df_factor)
+
+# Extract the incidence rate by county
+df_incidence_rate <- df_merged %>%
+  mutate(incidence_rate = (observed_total / total_population) * 100) %>%
+  select(County, incidence_rate)
+
+# Forrelation matrix (excluding County column)
+cor_matrix <- round(cor(df_factor %>% select(-County), use = "complete.obs"), 3)
+print(cor_matrix)
+################## median_age gender_ratio education_level median_income ################
+# median_age           1.000        0.220          -0.373        -0.132                  #
+# gender_ratio         0.220        1.000          -0.477        -0.265                  #
+# education_level     -0.373       -0.477           1.000         0.429                  #
+# median_income       -0.132       -0.265           0.429         1.000                  #
+##########################################################################################
+library(corrplot)
+
+# plot for correlation
+corrplot(
+  cor_matrix,
+  type = "lower",
+  col = colorRampPalette(c("red", "white", "green"))(200),
+  method = "square",
+  diag = FALSE
+)
+
+# Bartlett's test of sphericity
+factor_vars <- df_factor %>%
+  select(-County)
+  n_obs <- nrow(factor_vars)
+
+scaled_factor_vars <- scale(factor_vars)
  
-   # Evaluate model accuracy with RMSE
-  set.seed(42)
-  train_idx <- sample(1:nrow(scaled_factor_vars), size = 0.8 * nrow(scaled_factor_vars))
-  train_data <- df_model[train_idx, ]
-  test_data <- df_model[-train_idx, ]
-  
-  # Fit the model on training data
-  lm_model <- lm(incidence_rate ~ Factor1, data = train_data)
-  
-  # Predict on test set
-  test_data$predicted <- predict(lm_model, newdata = test_data)
-  
-  # Compute RMSE
-  rmse <- sqrt(mean((test_data$incidence_rate - test_data$predicted)^2))
-  print(paste("RMSE on test set:", round(rmse, 4)))
+# Bartlett's test
+bartlett_result <- cortest.bartlett(cor(scaled_factor_vars, use = "complete.obs"), n = n_obs)
+print(bartlett_result)
+
+
+# KMO
+KMO(r = cor(scaled_factor_vars))
+
+# scree plot
+scree(cor(scaled_factor_vars),factors = T, pc=T)
+
+# eigen value
+data.frame(factor = 1:ncol(scaled_factor_vars), eigen = eigen(cor(factor_vars))$values)
+
+# factor     eigen
+#  1      1 1.9785714
+#  2      2 0.8710690
+#  3      3 0.7136046
+#  4      4 0.4367549
+
+# Parallel Analysis 
+fa.parallel(scaled_factor_vars, fa = "fa", fm = "pa")
+
+# Variance explained
+result = fa(r = scaled_factor_vars,nfactors = 1,fm = 'pa',rotate = 'none')
+result$Vaccounted
+
+# PA1
+#SS loadings    1.4942798
+#Proportion Var 0.3735699
+
+# Communalities
+data.frame(communality = result$communality)
+
+# Communality
+# median_age        0.2586987
+# gender_ratio      0.2911646
+# education_level   0.7717270
+# median_income     0.3088721
+
+fa_varimax = fa(r = scaled_factor_vars,nfactors = 1,fm = 'pa',rotate = 'varimax')
+print(fa_varimax$loadings,cut=0.15)
+
+# Factor loadings diagram
+fa.diagram(fa_varimax$loadings, sort = T)
+
+# Factor 1 appears to reflect a latent dimension of social resources and opportunity.
+# It is positively associated with higher levels of education (loading: +0.878) and median income (+0.492),
+# while negatively associated with gender ratio (−0.539) and median age (−0.419).
+# This suggests that counties with more educated, higher-income, relatively younger populations — and possibly a higher proportion of women — score higher on this factor. These characteristics are often linked to greater access to health-related resources, awareness, and preventive care.
+# Therefore, Factor 1 can be interpreted as a Social Opportunity and Health Access Factor, capturing the socioeconomic and demographic conditions that may influence cancer outcomes such as incidence or survivorship.
+
+
+# Save factor scores (explicitly name the column as "Factor1" to avoid errors)
+factor_scores <- data.frame(
+  County = df_factor$County,
+  Factor1 = fa_varimax$scores[, 1]   # Extract the first factor score and label it "Factor1"
+)
+
+# Merge factor scores with cancer incidence rate data
+df_model <- left_join(factor_scores, df_incidence_rate, by = "County") %>%
+  na.omit()
+
+# Run linear regression: incidence rate ~ factor score
+lm_model <- lm(incidence_rate ~ Factor1, data = df_model)
+
+ # Check linear relationship using original independent variables
+summary(lm_model)
+
+# Fit regression model using education and income separately
+df_model_direct <- df_merged %>%
+  select(County, education_level, median_income, observed_total, total_population) %>%
+  mutate(incidence_rate = (observed_total / total_population) * 100) %>%
+  na.omit()
+
+lm_direct <- lm(incidence_rate ~ education_level + median_income, data = df_model_direct)
+summary(lm_direct)
+
+ # Evaluate model accuracy with RMSE
+set.seed(42)
+train_idx <- sample(1:nrow(scaled_factor_vars), size = 0.8 * nrow(scaled_factor_vars))
+train_data <- df_model[train_idx, ]
+test_data <- df_model[-train_idx, ]
+
+# Fit the model on training data
+lm_model <- lm(incidence_rate ~ Factor1, data = train_data)
+
+# Predict on test set
+test_data$predicted <- predict(lm_model, newdata = test_data)
+
+# Compute RMSE
+rmse <- sqrt(mean((test_data$incidence_rate - test_data$predicted)^2))
+print(paste("RMSE on test set:", round(rmse, 4)))
