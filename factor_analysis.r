@@ -1,4 +1,4 @@
-# import libraries
+# Import libraries
 library(dplyr)
 library(stringr)
 library(tidyr)
@@ -6,14 +6,14 @@ library(ggplot2)
 library(viridis)
 library(psych)
 
-# read data
+# Read data
 df_county <- read.csv('Data/GeoID_County_Mapping.csv')
 df_cancer <- read.csv('Data/NYSDOH_CancerMapping_Data.csv')
 df_pop <- read.csv('Data/County_Population_by_Characteristics.csv')
 df_edu <- read.csv('Data/Education_by_County.csv')
 df_income <- read.csv('Data/Income_by_County.csv')
 
-# basic data exploration for datasets
+# Basic data exploration for datasets
 str(df_county)
 str(df_cancer)
 str(df_pop)
@@ -50,7 +50,7 @@ print(na_counts_per_col)
 # We identify there were several N/A values, but it is in variables that
 # we will use. Therefore we choose to delete and ignore them
 
-# clean cancer dataset:
+# Clean cancer dataset:
 #   extract first 5 numbers which represents county 
 #   aggregate cancer data on county level
 df_cancer$geoid_county <- as.numeric(substr(df_cancer$Dohregion, 1, 5))
@@ -63,7 +63,7 @@ df_cancer <- df_cancer %>%
   group_by(geoid_county) %>% 
   summarise(across(everything(), sum))
 
-# clean population dataset:
+# Clean population dataset:
 #   keep columns of interest
 #   remove the string county, filter to latest year
 colnames(df_pop)[colnames(df_pop) == "COUNTY"] <- "County_ID"
@@ -74,7 +74,7 @@ df_pop <- df_pop %>%
   filter(YEAR == 12) %>% 
   select(-c(SUMLEV, STATE, County_ID, STNAME, YEAR))
 
-# clean county dataset:
+# Clean county dataset:
 #   get distinct geo_id and county names
 colnames(df_county)[colnames(df_county) == "GEOID.For.County"] <- "geoid_county"
 
@@ -82,7 +82,7 @@ df_county <- df_county %>%
   select(geoid_county, County) %>% 
   distinct()
 
-# clean education dataset:
+# Clean education dataset:
 #   format text and columns
 #   perform aggregation on county level
 colnames(df_edu) <- as.character(df_edu[1,])
@@ -96,7 +96,7 @@ df_edu <- df_edu %>%
   summarize(across(!c(Geography))) %>% 
   select(-2, -3)
 
-# clean income dataset:
+# Clean income dataset:
 #   tidy columns and text format
 #   perform aggregation on county level
 colnames(df_income) <- as.character(df_income[1,])
@@ -115,19 +115,19 @@ df_income <- df_income %>%
     median_income = mean(`Median income (dollars)!!Estimate!!Households`, na.rm = TRUE)
   )
 
-# join datasets to get cancer, county, population, income, and education level
+# Join datasets to get cancer, county, population, income, and education level
 df_cancer <- merge(x = df_cancer, y = df_county, by = "geoid_county", all = TRUE)
 df_cancer <- merge(x = df_cancer, y = df_pop, by = "County", all = TRUE)
 df_cancer <- merge(x = df_cancer, y = df_edu, by = "County", all = TRUE)
 df_cancer <- merge(x = df_cancer, y = df_income, by = "County", all = TRUE)
 
-# clean cancer dataset for observed_total only
+# Clean cancer dataset for observed_total only
 df_cancer <- df_cancer %>% 
   select(observed_Total, geoid_county) %>% 
   group_by(geoid_county) %>% 
   summarise(observed_total = sum(observed_Total, na.rm = TRUE))
 
-# clean population dataset: extract median age and gender ratio
+# Clean population dataset: extract median age and gender ratio
 df_pop <- df_pop %>%
   select(County, POPESTIMATE, POPEST_MALE, POPEST_FEM, MEDIAN_AGE_TOT) %>%
   group_by(County) %>%
@@ -138,7 +138,7 @@ df_pop <- df_pop %>%
   )
 
 
-# clean education dataset and calculate education_level index
+# Clean education dataset and calculate education_level index
 char_cols <- df_edu %>%
   select(where(is.character)) %>%
   select(-County) %>%
@@ -159,7 +159,7 @@ df_edu <- df_edu %>%
 colnames(df_edu)
 
 
-# merge all datasets into a single dataset for analysis
+# Merge all datasets into a single dataset for analysis
 df_merged <- df_cancer %>%
   left_join(df_county, by = "geoid_county") %>%
   left_join(df_pop, by = "County") %>%
@@ -168,18 +168,18 @@ df_merged <- df_cancer %>%
 
  colnames(df_merged)
   
-  # extract columns for factor analysis
+  # Extract columns for factor analysis
   df_factor<-df_merged %>%
     select(County,median_age,gender_ratio,education_level,median_income)
   
   head(df_factor)
   
-  # extract the incidence rate by county
+  # Extract the incidence rate by county
   df_incidence_rate <- df_merged %>%
     mutate(incidence_rate = (observed_total / total_population) * 100) %>%
     select(County, incidence_rate)
   
-  # correlation matrix (excluding County column)
+  # Forrelation matrix (excluding County column)
   cor_matrix <- round(cor(df_factor %>% select(-County), use = "complete.obs"), 3)
   print(cor_matrix)
   ################## median_age gender_ratio education_level median_income ################
@@ -199,26 +199,25 @@ df_merged <- df_cancer %>%
     diag = FALSE
   )
   
-# Bartlett's test of sphericity
+  # Bartlett's test of sphericity
+  factor_vars <- df_factor %>%
+    select(-County)
+    n_obs <- nrow(factor_vars)
   
-  factor_vars <- df_factor %>% select(-County)
-   n_obs <- nrow(factor_vars)
-  
-   scaled_factor_vars<-scale(factor_vars)
-   
+  scaled_factor_vars <- scale(factor_vars)
    
   # Bartlett's test
   bartlett_result <- cortest.bartlett(cor(scaled_factor_vars, use = "complete.obs"), n = n_obs)
   print(bartlett_result)
   
   
-  #KMO
+  # KMO
   KMO(r = cor(scaled_factor_vars))
   
-  #scree plot
+  # scree plot
   scree(cor(scaled_factor_vars),factors = T, pc=T)
   
-  #eigen value
+  # eigen value
   data.frame(factor = 1:ncol(scaled_factor_vars), eigen = eigen(cor(factor_vars))$values)
   
  # factor     eigen
@@ -230,39 +229,40 @@ df_merged <- df_cancer %>%
   # Parallel Analysis 
   fa.parallel(scaled_factor_vars, fa = "fa", fm = "pa")
   
-  #variance explained
+  # Variance explained
   result = fa(r = scaled_factor_vars,nfactors = 1,fm = 'pa',rotate = 'none')
   result$Vaccounted
   
-  #PA1
+  # PA1
   #SS loadings    1.4942798
   #Proportion Var 0.3735699
   
-  # communalities
+  # Communalities
   data.frame(communality = result$communality)
   
-  #communality
-  #median_age        0.2586987
-  #gender_ratio      0.2911646
-  #education_level   0.7717270
-  #median_income     0.3088721
+  # Communality
+  # median_age        0.2586987
+  # gender_ratio      0.2911646
+  # education_level   0.7717270
+  # median_income     0.3088721
   
   fa_varimax = fa(r = scaled_factor_vars,nfactors = 1,fm = 'pa',rotate = 'varimax')
   print(fa_varimax$loadings,cut=0.15)
-  
 
+  # Factor loadings diagram
+  fa.diagram(fa_varimax$loadings, sort = T)
   
-  #Factor 1 appears to reflect a latent dimension of social resources and opportunity.
-  #It is positively associated with higher levels of education (loading: +0.878) and median income (+0.492),
-  #while negatively associated with gender ratio (−0.539) and median age (−0.419).
-  #This suggests that counties with more educated, higher-income, relatively younger populations — and possibly a higher proportion of women — score higher on this factor. These characteristics are often linked to greater access to health-related resources, awareness, and preventive care.
-  #Therefore, Factor 1 can be interpreted as a Social Opportunity and Health Access Factor, capturing the socioeconomic and demographic conditions that may influence cancer outcomes such as incidence or survivorship.
+  # Factor 1 appears to reflect a latent dimension of social resources and opportunity.
+  # It is positively associated with higher levels of education (loading: +0.878) and median income (+0.492),
+  # while negatively associated with gender ratio (−0.539) and median age (−0.419).
+  # This suggests that counties with more educated, higher-income, relatively younger populations — and possibly a higher proportion of women — score higher on this factor. These characteristics are often linked to greater access to health-related resources, awareness, and preventive care.
+  # Therefore, Factor 1 can be interpreted as a Social Opportunity and Health Access Factor, capturing the socioeconomic and demographic conditions that may influence cancer outcomes such as incidence or survivorship.
   
   
   # Save factor scores (explicitly name the column as "Factor1" to avoid errors)
   factor_scores <- data.frame(
     County = df_factor$County,
-    Factor1 = fa_result$scores[, 1]   # Extract the first factor score and label it "Factor1"
+    Factor1 = fa_varimax$scores[, 1]   # Extract the first factor score and label it "Factor1"
   )
   
   # Merge factor scores with cancer incidence rate data
@@ -291,7 +291,6 @@ df_merged <- df_cancer %>%
   test_data <- df_model[-train_idx, ]
   
   # Fit the model on training data
-
   lm_model <- lm(incidence_rate ~ Factor1, data = train_data)
   
   # Predict on test set
