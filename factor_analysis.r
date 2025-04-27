@@ -169,7 +169,7 @@ df_merged <- df_cancer %>%
 colnames(df_merged)
 
 # Extract columns for factor analysis
-df_factor<-df_merged %>%
+df_factor <- df_merged %>%
   select(County,median_age,gender_ratio,education_level,median_income)
 
 head(df_factor)
@@ -179,7 +179,7 @@ df_incidence_rate <- df_merged %>%
   mutate(incidence_rate = (observed_total / total_population) * 100) %>%
   select(County, incidence_rate)
 
-# Forrelation matrix (excluding County column)
+# Correlation matrix (excluding County column)
 cor_matrix <- round(cor(df_factor %>% select(-County), use = "complete.obs"), 3)
 print(cor_matrix)
 ################## median_age gender_ratio education_level median_income ################
@@ -209,7 +209,6 @@ scaled_factor_vars <- scale(factor_vars)
 # Bartlett's test
 bartlett_result <- cortest.bartlett(cor(scaled_factor_vars, use = "complete.obs"), n = n_obs)
 print(bartlett_result)
-
 
 # KMO
 KMO(r = cor(scaled_factor_vars))
@@ -299,3 +298,14 @@ test_data$predicted <- predict(lm_model, newdata = test_data)
 # Compute RMSE
 rmse <- sqrt(mean((test_data$incidence_rate - test_data$predicted)^2))
 print(paste("RMSE on test set:", round(rmse, 4)))
+
+# Plot cancer incidence rate and factor1
+ggplot(df_model, aes(x = Factor1, y = incidence_rate)) +
+  geom_point(color = "blue", alpha = 0.6) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  labs(
+    title = "Cancer Incidence Rate vs. Socioeconomic Factor Score",
+    x = "Factor 1 Score (Social Opportunity)",
+    y = "Cancer Incidence Rate (per 100 people)"
+  ) +
+  theme_minimal()
