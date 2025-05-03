@@ -245,11 +245,34 @@ data.frame(communality = result$communality)
 # education_level   0.7717270
 # median_income     0.3088721
 
+# Rotation and loadings, weights
 fa_varimax = fa(r = scaled_factor_vars,nfactors = 1,fm = 'pa',rotate = 'varimax')
 print(fa_varimax$loadings,cut=0.15)
 
+# Loadings:
+#                PA1   
+# median_age      -0.388
+# gender_ratio    -0.534
+# education_level  0.921
+# median_income    0.458
+
+#                 PA1
+# SS loadings    1.494
+# Proportion Var 0.374
+
+fa_varimax$weights
+  # PA1
+  # median_age      -0.04847069
+  # gender_ratio    -0.11495544
+  # education_level  0.81820995
+  # median_income    0.06978256
+
+
+
 # Factor loadings diagram
 fa.diagram(fa_varimax$loadings, sort = T)
+
+
 
 # Factor 1 appears to reflect a latent dimension of social resources and opportunity.
 # It is positively associated with higher levels of education (loading: +0.878) and median income (+0.492),
