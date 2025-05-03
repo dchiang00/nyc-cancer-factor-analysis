@@ -137,7 +137,6 @@ df_pop <- df_pop %>%
     gender_ratio = mean(POPEST_MALE / POPEST_FEM, na.rm = TRUE)
   )
 
-
 # Clean education dataset and calculate education_level index
 char_cols <- df_edu %>%
   select(where(is.character)) %>%
@@ -157,7 +156,6 @@ df_edu <- df_edu %>%
            (less_than_hs + hs_grad + some_college + bachelor_plus)) %>%
   select(County, education_level)
 colnames(df_edu)
-
 
 # Merge all datasets into a single dataset for analysis
 df_merged <- df_cancer %>%
@@ -199,18 +197,18 @@ corrplot(
   diag = FALSE
 )
 
-# Bartlett's test of sphericity
+# Scale factors before factor analysis
 factor_vars <- df_factor %>%
   select(-County)
   n_obs <- nrow(factor_vars)
 
 scaled_factor_vars <- scale(factor_vars)
  
-# Bartlett's test
+# Bartlett's test of sphericity
 bartlett_result <- cortest.bartlett(cor(scaled_factor_vars, use = "complete.obs"), n = n_obs)
 print(bartlett_result)
 
-# KMO
+# KMO test for partial correlations
 KMO(r = cor(scaled_factor_vars))
 
 # scree plot
@@ -280,7 +278,6 @@ fa.diagram(fa_varimax$loadings, sort = T)
 # This suggests that counties with more educated, higher-income, relatively younger populations — and possibly a higher proportion of women — score higher on this factor. These characteristics are often linked to greater access to health-related resources, awareness, and preventive care.
 # Therefore, Factor 1 can be interpreted as a Social Opportunity and Health Access Factor, capturing the socioeconomic and demographic conditions that may influence cancer outcomes such as incidence or survivorship.
 
-
 # Save factor scores (explicitly name the column as "Factor1" to avoid errors)
 factor_scores <- data.frame(
   County = df_factor$County,
@@ -303,8 +300,8 @@ df_model_direct <- df_merged %>%
   mutate(incidence_rate = (observed_total / total_population) * 100) %>%
   na.omit()
 
-lm_direct <- lm(incidence_rate ~ education_level + median_income, data = df_model_direct)
-summary(lm_direct)
+# lm_direct <- lm(incidence_rate ~ education_level + median_income, data = df_model_direct)
+# summary(lm_direct)
 
  # Evaluate model accuracy with RMSE
 set.seed(42)
