@@ -354,234 +354,152 @@ display: none;
 
 <div id="factor-analysis-of-the-drivers-of-cancer-prevalence-in-new-york" class="section level1">
 <h1>Factor Analysis of the Drivers of Cancer Prevalence in New York</h1>
-<hr />
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
-<p>Cancer remains a leading cause of mortality in New York State, with
-its prevalence shaped by socioeconomic and demographic factors. While
-prior research highlights disparities in cancer incidence and survival,
-most studies focus on racial differences at a national level, often
-using regression-based models to examine direct causal links. However,
-fewer studies explore whether higher social status—measured by income
-and education—translates into better survival outcomes for chronic
-diseases like cancer.</p>
-<p>This study addresses a fundamental equity question: <strong>Does
-higher socioeconomic status truly improve survival, or do structural
-barriers limit health equity?</strong> Using Exploratory Factor Analysis
-(EFA), we will identify latent socioeconomic and demographic patterns
-influencing cancer survival disparities across New York counties. We
-will then construct a linear regression model to quantify the impact of
-these factors on survival rates, offering insights into how social
-mobility intersects with health outcomes.</p>
-<hr />
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>This project investigates the latent socioeconomic and demographic
+patterns influencing cancer incidence across New York counties. Using
+Exploratory Factor Analysis (EFA) and regression modeling, we identify
+key variables that affect regional disparities in cancer outcomes. Our
+analysis reveals a latent factor capturing higher education, income,
+younger median age, and a greater proportion of women, which is
+significantly associated with lower cancer incidence.</p>
 </div>
-<div id="research-questions-and-hypotheses" class="section level2">
-<h2>Research Questions and Hypotheses</h2>
-<p>This project seeks to explore the following research questions:</p>
-<ul>
-<li>What underlying socioeconomic and demographic factors contribute to
-variations in cancer prevalence and survival across New York
-counties?</li>
-<li>Are individuals with higher social status truly at an advantage in
-surviving chronic diseases, or do structural healthcare barriers limit
-their survival gains?</li>
-<li>Does factor analysis reveal hidden systemic patterns that challenge
-the assumption that economic and educational success guarantees better
-health outcomes?</li>
-</ul>
-<p>By addressing these questions, we aim to go beyond simple
-correlations and critically examine whether social mobility genuinely
-impacts cancer survival, shedding light on broader questions of health
-equity and structural disparities in healthcare access.</p>
-<hr />
-</div>
-<div id="literature-review" class="section level2">
-<h2>Literature Review</h2>
-<p>Much of the existing research has focused on national-level data,
-often emphasizing racial disparities as a primary explanatory factor for
-socioeconomic influences on cancer outcomes.</p>
-<ul>
-<li><strong>Miller et al. (2022)</strong> highlight significant racial
-disparities in cancer survivorship due to barriers in healthcare access
-and systemic inequities.</li>
-<li><strong>Singh and Jemal (2017)</strong> analyzed six decades of
-data, demonstrating that the correlation between SES and cancer
-mortality has intensified—lower-income groups now experience
-significantly higher rates due to socioeconomic disadvantages.</li>
-<li><strong>Ramsey et al. (2016)</strong> provide evidence that
-financial insolvency is a strong predictor of early mortality.</li>
-</ul>
-<p>These findings reinforce the critical role of socioeconomic
-disparities in cancer outcomes; however, most studies have primarily
-focused on race as the key demographic factor, without accounting for
-regional or local variations.</p>
-<p>Unlike previous research, this study emphasizes <strong>EFA</strong>
-to examine whether latent variables significantly influence cancer
-mortality at the county level within New York State.</p>
-<hr />
-</div>
-<div id="data-collection" class="section level2">
-<h2>Data Collection</h2>
-<p>Our data is combined from five separate datasets found through the US
-Census Bureau and NY State Data. Each dataset is then aggregated into
-county-level summaries that is then combined and cleaned into one
-complete dataset for analysis (see Data Preparation Efforts):</p>
+<div id="research-questions" class="section level2">
+<h2>Research Questions</h2>
 <ol style="list-style-type: decimal">
-<li><strong>New York State Dept. of Health (DOH) Cancer Mapping Data
-(2011–2015)</strong>
-<ul>
-<li>Dataset of cancer occurrences across 13,514 GEOID (DOH block
-groups).<br />
-</li>
-<li>Includes expected cancer rates based on 2005–2009 data.<br />
-</li>
-<li>Indicates whether the block group is in an elevated cancer
-region.</li>
-</ul></li>
-<li><strong>New York State GEOID to County Mapping</strong>
-<ul>
-<li>Dataset appended with additional research that maps the GEOID found
-in the Cancer Mapping Data to NY counties.</li>
-</ul></li>
-<li><strong>US Census Bureau New York County Education Data</strong>
-<ul>
-<li>Dataset of educational attainment levels as a percentage of county
-population, across NY counties.</li>
-</ul></li>
-<li><strong>US Census Bureau New York County Income Data</strong>
-<ul>
-<li>Dataset of household income across NY counties.<br />
-</li>
-<li>Includes 122 variables; only <strong>median income</strong> is
-selected.</li>
-</ul></li>
-<li><strong>US Census Bureau New York County Population by
-Characteristics</strong>
-<ul>
-<li>Dataset of New York county populations, divided by age group and
-gender.<br />
-</li>
-<li>Contains data collected across 12 years from 2009; only the 12th
-year is used.</li>
-</ul></li>
+<li>What underlying socioeconomic and demographic factors contribute to
+variations in cancer prevalence across New York counties?</li>
+<li>Do higher social status and education reduce cancer incidence, or
+are there structural barriers that limit health equity?</li>
+<li>Can factor analysis uncover hidden patterns beyond simple variable
+correlations?</li>
 </ol>
-<hr />
+</div>
+<div id="data-sources" class="section level2">
+<h2>Data Sources</h2>
+<p>Our final dataset includes 152 variables drawn from five public
+datasets:</p>
+<ul>
+<li><strong>NY State Dept. of Health Cancer Mapping
+(2011–2015)</strong>: Observed cancer cases by type at block group
+level.</li>
+<li><strong>GEOID to County Mapping</strong>: Matches geographic
+identifiers to counties.</li>
+<li><strong>US Census Education Data</strong>: Educational attainment
+levels.</li>
+<li><strong>US Census Income Data</strong>: Median household
+income.</li>
+<li><strong>US Census Population Characteristics</strong>: Demographics
+by age and gender.</li>
+</ul>
+<p>Note: Data was aggregated and cleaned at the county level,
+representing 62 counties in NY State.</p>
 </div>
 <div id="data-cleaning-and-preprocessing" class="section level2">
 <h2>Data Cleaning and Preprocessing</h2>
-<p>To prepare the dataset for analysis, we performed extensive data
-cleaning and preprocessing to ensure accuracy, consistency, and
-usability. Our efforts focused on standardizing formats, resolving
-inconsistencies, and integrating multiple sources into a single,
-structured dataset.</p>
-<div id="cleaning-and-standardization" class="section level3">
-<h3>Cleaning and Standardization</h3>
 <ul>
-<li><strong>Cancer Data:</strong>
+<li>Standardized county names and identifiers.</li>
+<li>Consolidated variables into key indicators:
 <ul>
-<li>Extracted the first five digits from the <code>Dohregion</code>
-column to create a county-level geographic identifier
-(<code>geoid_county</code>).<br />
-</li>
-<li>Retained relevant columns such as observed and expected cancer
-cases.<br />
-</li>
-<li>Aggregated data at the county level.</li>
-</ul></li>
-<li><strong>Population Data:</strong>
-<ul>
-<li>Standardized column names.<br />
-</li>
-<li>Removed unnecessary text (e.g., “county” from county names).<br />
-</li>
-<li>Filtered for the most recent year’s data.</li>
-</ul></li>
-<li><strong>Education and Income Data:</strong>
-<ul>
-<li>Reformatted county identifiers.<br />
-</li>
-<li>Processed the <code>Geographic Area Name</code> column to derive
-county names.<br />
-</li>
-<li>Aggregated data to obtain education attainment percentages and
-median household income.</li>
+<li><code>median_age</code></li>
+<li><code>gender_ratio</code> (male-to-female)</li>
+<li><code>education_level</code> (weighted education index)</li>
+<li><code>median_income</code></li>
 </ul></li>
 </ul>
 </div>
-<div id="merging-process" class="section level3">
-<h3>Merging Process</h3>
-<p>After cleaning, datasets were merged sequentially:</p>
+<div id="methodology" class="section level2">
+<h2>Methodology</h2>
+<div id="exploratory-factor-analysis-efa" class="section level3">
+<h3>1. Exploratory Factor Analysis (EFA)</h3>
+<ul>
+<li>Assessed dataset suitability with:
+<ul>
+<li>Correlation Matrix</li>
+<li>Bartlett’s Test (χ² = 36.56, p &lt; 0.001)</li>
+<li>KMO = 0.65</li>
+</ul></li>
+<li>Scree Plot and Parallel Analysis suggested <strong>1 latent
+factor</strong>.</li>
+<li>Extracted factor explained <strong>37.4% of total
+variance</strong>.</li>
+<li>Highest loading: <code>education_level (0.921)</code></li>
+<li>Interpretation: <strong>“Socioeconomically Advantaged Young Women
+Group”</strong></li>
+</ul>
+</div>
+<div id="regression-analysis" class="section level3">
+<h3>2. Regression Analysis</h3>
+<ul>
+<li><p>Used latent factor as independent variable for predicting cancer
+incidence rate.</p></li>
+<li><p>Model:</p>
+<pre><code>cancer_incidence_rate = β0 + β1 * latent_factor + ε</code></pre>
+<ul>
+<li>β1 = -0.173 (p &lt; 0.01)</li>
+<li>R² = 0.115</li>
+</ul></li>
+<li><p>Compared to baseline model using raw education and income, the
+latent factor showed stronger predictive power.</p></li>
+</ul>
+</div>
+<div id="model-accuracy" class="section level3">
+<h3>3. Model Accuracy</h3>
+<ul>
+<li><strong>RMSE</strong> on test set: <strong>0.6688</strong></li>
+<li>Given incidence rates range from 2–5%, this is acceptable in social
+science modeling.</li>
+</ul>
+</div>
+</div>
+<div id="key-findings" class="section level2">
+<h2>Key Findings</h2>
+<ul>
+<li>Higher education and youth demographics are more predictive of lower
+cancer incidence than income alone.</li>
+<li>Latent factor modeling outperforms individual predictors.</li>
+<li>Structural advantages embedded in education and gender composition
+drive lower incidence.</li>
+</ul>
+</div>
+<div id="recommendations" class="section level2">
+<h2>Recommendations</h2>
 <ol style="list-style-type: decimal">
-<li>Linked cancer data to county mapping.</li>
-<li>Added population data.</li>
-<li>Added education data.</li>
-<li>Added income data.</li>
+<li><strong>Invest in Health Education</strong>: Especially for
+less-educated counties.</li>
+<li><strong>Design Holistic Interventions</strong>: Use aggregate
+demographic profiles for targeted public health strategies.</li>
+<li><strong>Prioritize Structurally Disadvantaged Counties</strong>:
+Direct healthcare support where composite scores are low.</li>
 </ol>
-<p>The final dataset includes <strong>62 counties</strong> and
-<strong>152 variables</strong>, covering cancer prevalence,
-demographics, education, and income. While our initial analysis focuses
-on five primary variables, we will incorporate additional ones to refine
-our factor analysis and regression model.</p>
-<hr />
 </div>
-</div>
-<div id="methodology-and-analysis-plan" class="section level2">
-<h2>Methodology and Analysis Plan</h2>
-<p>To assess the suitability of our dataset for factor analysis, we will
-first examine the correlation matrix among income, education, and cancer
-cases. <strong>Bartlett’s Test of Sphericity</strong> will be conducted
-to confirm significant correlations between variables (p &lt; 0.05). We
-will also compute the <strong>Kaiser-Meyer-Olkin (KMO)</strong> score,
-aiming for a value above 0.6 to validate the adequacy of factor
-extraction.</p>
-<p>The optimal number of factors will be determined using:</p>
+<div id="future-work" class="section level2">
+<h2>Future Work</h2>
 <ul>
-<li><strong>Scree Plot</strong></li>
-<li><strong>Eigenvalue Criterion</strong> (eigenvalues &gt; 1)</li>
-<li>Minimum 60% of total variance explained</li>
+<li>Incorporate additional variables to extract multiple latent
+dimensions.</li>
+<li>Explore causal pathways and intervention strategies at a more
+granular level.</li>
 </ul>
-<p>Factor extraction will be performed using <strong>Maximum Likelihood
-Estimation (MLE)</strong>. We anticipate that socioeconomic factors
-(e.g., income and education) will cluster together, while regional and
-demographic variables may form distinct factors representing geographic
-disparities in cancer prevalence.</p>
-<p>Following factor extraction, we will employ a <strong>regression
-model</strong> to assess the impact of these latent factors on mortality
-differences among counties. This analysis will help quantify the extent
-to which socioeconomic and regional disparities contribute to variations
-in mortality outcomes.</p>
-<hr />
-</div>
-<div id="conclusion" class="section level2">
-<h2>Conclusion</h2>
-<p>This study aims to uncover structural inequalities influencing cancer
-survival rates in New York State. Through <strong>EFA</strong>, we will
-identify hidden patterns and validate their impact using a
-<strong>regression model</strong>, challenging the notion that economic
-and educational success alone guarantees better health outcomes.</p>
-<hr />
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
 <ul>
-<li><p>Tavakol, M., &amp; Wetzel, A. (2020). <em>Factor analysis: A
-means for theory and instrument development in support of construct
-validity</em>. International Journal of Medical Education, 11, 245–247.
-<a href="https://doi.org/10.5116/ijme.5f96.0f4a" class="uri">https://doi.org/10.5116/ijme.5f96.0f4a</a></p></li>
-<li><p>Miller, K. D., Nogueira, L., Devasia, T., Mariotto, A. B.,
-Yabroff, K. R., Jemal, A., Kramer, J., &amp; Siegel, R. L. (2022).
-<em>Cancer treatment and survivorship statistics, 2022</em>. CA: A
-Cancer Journal for Clinicians, 72(5), 409–436. <a href="https://doi.org/10.3322/caac.21731" class="uri">https://doi.org/10.3322/caac.21731</a></p></li>
-<li><p>Ramsey, S. D., Bansal, A., Fedorenko, C. R., Blough, D. K.,
-Overstreet, K. A., Shankaran, V., &amp; Newcomb, P. (2016).
-<em>Financial insolvency as a risk factor for early mortality among
-patients with cancer</em>. Journal of Clinical Oncology, 34(9), 980–986.
-<a href="https://doi.org/10.1200/JCO.2015.64.6620" class="uri">https://doi.org/10.1200/JCO.2015.64.6620</a></p></li>
-<li><p>Singh, G. K., &amp; Jemal, A. (2017). <em>Socioeconomic and
-racial/ethnic disparities in cancer mortality, incidence, and survival
-in the United States, 1950–2014: Over six decades of changing patterns
-and widening inequalities</em>. Journal of Environmental and Public
-Health, 2017, 1–19. <a href="https://doi.org/10.1155/2017/2819372" class="uri">https://doi.org/10.1155/2017/2819372</a></p></li>
+<li>Griffiths et al. (2006). <a href="https://doi.org/10.1136/oem.2005.023671">OEM Article</a><br />
+</li>
+<li>Hastert et al. (2019). <a href="https://doi.org/10.1007/s11764-019-00764-y">Journal of Cancer
+Survivorship</a><br />
+</li>
+<li>Juang et al. (2025). <a href="https://doi.org/10.1038/s41598-025-19812-7">Scientific
+Reports</a><br />
+</li>
+<li>Miller et al. (2022). <a href="https://doi.org/10.3322/caac.21731">CA: A Cancer Journal for
+Clinicians</a><br />
+</li>
+<li>Singh &amp; Jemal (2017). <a href="https://doi.org/10.1155/2017/2819372">Journal of Environmental and
+Public Health</a><br />
+</li>
+<li>Tavakol &amp; Wetzel (2020). <a href="https://doi.org/10.5116/ijme.5f96.0f4">IJME Article</a></li>
 </ul>
 </div>
 </div>

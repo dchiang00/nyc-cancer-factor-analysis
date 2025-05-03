@@ -145,7 +145,7 @@ KMO(r = cor(df_no_county))
 
 # Overall MSA from Cortest Bartlett test returning 0.5, indicated the data
 # is not yet suitable for factor analysis. In our next factor_analysis.r code,
-# we will run our next iteration with featuer engineering to better prepare our data
+# we will run our next iteration with feature engineering to better prepare our data
 # for factor analysis
 
 # determine the number of factors
